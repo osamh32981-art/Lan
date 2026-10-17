@@ -1,5 +1,5 @@
-name: lan
-description: اتصال صوت وصورة ورسائل بدون نت LAN
+name: whatsapp
+description: whatsapp lan
 publish_to: 'none'
 version: 1.0.0+1
 environment:
