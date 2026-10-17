@@ -1,106 +1,85 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-
-void main() => runApp(const MyApp());
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override Widget build(BuildContext context) => MaterialApp(debugShowCheckedModeBanner: false, theme: ThemeData(useMaterial3: false), home: const LoginPrivate());
+void main(){ runApp(MyApp()); }
+class MyApp extends StatelessWidget{
+  @override Widget build(BuildContext c){ return MaterialApp(debugShowCheckedModeBanner: false, home: Login()); }
 }
-
-// ============ تسجيل دخول برقم واسم - خصوصية ============
-class LoginPrivate extends StatefulWidget { const LoginPrivate({super.key}); @override State<LoginPrivate> createState() => _LoginP(); }
-class _LoginP extends State<LoginPrivate> {
-  final phone = TextEditingController(text: "05");
-  final name = TextEditingController(text: "المصمم");
+class Login extends StatelessWidget{
+  final p = TextEditingController(text: "05");
+  final n = TextEditingController(text: "المصمم");
   @override Widget build(BuildContext context){
-    return Directionality(textDirection: TextDirection.rtl, child: Scaffold(backgroundColor: const Color(0xFF111B21),
-      body: Center(child: Container(margin: const EdgeInsets.all(20), padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+    return Scaffold(backgroundColor: Color(0xFF111B21),
+      body: Center(child: Container(margin: EdgeInsets.all(20), padding: EdgeInsets.all(20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.lock, size: 50, color: Color(0xFF075E54)), const SizedBox(height: 8),
-          const Text("WhatsApp LAN - خصوصية", style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Color(0xFF075E54))),
-          const Text("دخول برقم واسم - دردشات منفصلة ومشفرة", style: TextStyle(fontSize: 11, color: Colors.grey)),
-          const SizedBox(height: 18),
-          TextField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: "رقم الجوال - مثال 05xxxxxxxx", prefixIcon: Icon(Icons.phone), border: OutlineInputBorder())),
-          const SizedBox(height: 10),
-          TextField(controller: name, decoration: const InputDecoration(labelText: "اسم المستخدم", prefixIcon: Icon(Icons.person), border: OutlineInputBorder())),
-          const SizedBox(height: 10),
-          Container(padding: const EdgeInsets.all(8), color: const Color(0xFFE7FFDB), child: const Row(children: [Icon(Icons.privacy_tip, size: 16, color: Color(0xFF075E54)), SizedBox(width: 6), Expanded(child: Text("كل دردشة منفصلة لوحدها - محفوظة برقمك فقط - لا يراها أحد", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)))])),
-          const SizedBox(height: 14),
-          SizedBox(width: double.infinity, height: 50, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366)), onPressed: (){
-            if(phone.text.length < 9){ ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("اكتب رقم صحيح"))); return; }
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> HomePrivate(phone: phone.text, userName: name.text)));
-          }, child: const Text("دخول آمن 🔒", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))))
-        ])))));
+          Icon(Icons.lock, size: 50, color: Color(0xFF075E54)),
+          Text("واتساب LAN", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF075E54))),
+          Text("رقم + اسم - خصوصية - منفصل", style: TextStyle(fontSize: 11, color: Colors.grey)),
+          SizedBox(height: 12),
+          TextField(controller: p, decoration: InputDecoration(labelText: "رقم الجوال", border: OutlineInputBorder(), prefixIcon: Icon(Icons.phone))),
+          SizedBox(height: 8),
+          TextField(controller: n, decoration: InputDecoration(labelText: "اسم المستخدم", border: OutlineInputBorder(), prefixIcon: Icon(Icons.person))),
+          SizedBox(height: 12),
+          SizedBox(width: double.infinity, height: 48, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF25D366)), onPressed: (){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> Home(phone: p.text, name: n.text)));
+          }, child: Text("دخول آمن", style: TextStyle(color: Colors.white))))
+        ]))));
   }
 }
-
-// ============ الرئيسية - دردشات منفصلة ============
-class HomePrivate extends StatefulWidget { final String phone; final String userName; const HomePrivate({super.key, required this.phone, required this.userName}); @override State<HomePrivate> createState()=> _HomePState(); }
-class _HomePState extends State<HomePrivate> {
-  // كل جهة اتصال لها دردشة منفصلة
-  List<Map<String,String>> contacts = [
-    {'name': 'أحمد - LAN', 'phone': '0555123456', 'ip': '192.168.1.5', 'last': 'أهلاً - دردشة منفصلة'},
-    {'name': 'لابتوب العائلة', 'phone': '0555000111', 'ip': '192.168.1.12', 'last': 'صورة LAN'},
-    {'name': 'محمد', 'phone': '0555999888', 'ip': '192.168.1.8', 'last': 'مكالمة صوتية'},
+class Home extends StatefulWidget{ final String phone; final String name; Home({required this.phone, required this.name}); @override State<Home> createState()=> _HomeS(); }
+class _HomeS extends State<Home>{
+  List<Map<String,String>> users = [
+    {'name':'أحمد','phone':'0555123456','msg':'أهلاً - دردشة خاصة'},
+    {'name':'محمد','phone':'0555987654','msg':'صورة LAN'},
+    {'name':'لابتوب','phone':'0555000111','msg':'مكالمة صوتية'},
   ];
-  Map<String, List<Map<String,dynamic>>> privateChats = {};
-
   @override Widget build(BuildContext context){
-    bool isDes = widget.userName.contains("المصمم");
+    bool isDes = widget.name.contains("المصمم");
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(backgroundColor: const Color(0xFF075E54), title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [const Text("WhatsApp", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), if(isDes) Container(margin: const EdgeInsets.only(right: 6), padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)), child: const Text("⭐ المصمم - موثق", style: TextStyle(fontSize: 9, color: Color(0xFF075E54), fontWeight: FontWeight.bold))) ]), Text("${widget.userName} • ${widget.phone} • خصوصية", style: const TextStyle(color: Colors.white70, fontSize: 10))]), actions: const [Icon(Icons.search, color: Colors.white), SizedBox(width: 10), Icon(Icons.more_vert, color: Colors.white), SizedBox(width: 6)]),
-      body: Container(color: Colors.white, child: Column(children: [
-        Container(color: const Color(0xFF111B21), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), child: Row(children: [const Icon(Icons.lock, color: Color(0xFF25D366), size: 16), const SizedBox(width: 6), Expanded(child: Text("دردشاتك محمية - كل محادثة منفصلة برقم ${widget.phone} - تشفير LAN", style: const TextStyle(color: Colors.white70, fontSize: 10)))])),
-        Expanded(child: ListView.separated(separatorBuilder: (_,__ )=> const Divider(height: 1), itemCount: contacts.length, itemBuilder: (_, i){
-          var c = contacts[i]; var msgs = privateChats[c['phone']] ?? []; var last = msgs.isNotEmpty ? msgs.last['text'] : c['last']!;
-          return ListTile(
-            leading: Stack(children: [CircleAvatar(radius: 26, backgroundColor: const Color(0xFFDFE5E7), child: Text(c['name']![0], style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF075E54)))), Positioned(bottom: 0, right: 0, child: Container(width: 12, height: 12, decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2))))]),
-            title: Row(children: [Text(c['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)), const SizedBox(width: 4), const Icon(Icons.lock, size: 12, color: Color(0xFF075E54))]),
-            subtitle: Row(children: [const Icon(Icons.done_all, size: 14, color: Colors.blue), const SizedBox(width: 4), Expanded(child: Text(last, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)))]),
-            trailing: Column(children: [Text("${DateTime.now().hour}:${DateTime.now().minute}", style: const TextStyle(fontSize: 11, color: Color(0xFF25D366))), if(msgs.isNotEmpty) Container(margin: const EdgeInsets.only(top: 4), padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFF25D366), borderRadius: BorderRadius.circular(10)), child: Text("${msgs.length}", style: const TextStyle(color: Colors.white, fontSize: 10)))]),
-            onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (_)=> PrivateChatPage(contact: c, myPhone: widget.phone, myName: widget.userName, chats: privateChats))); },
-          );
-        })),
-      ])),
-      floatingActionButton: FloatingActionButton(backgroundColor: const Color(0xFF25D366), onPressed: (){ showDialog(context: context, builder: (_)=> AlertDialog(title: const Text("إضافة جهة اتصال LAN"), content: const Text("سيتم اكتشاف أي شخص على نفس الواي فاي تلقائياً - أو أضف رقم يدوياً قريباً"), actions: [TextButton(onPressed: ()=> Navigator.pop(context), child: const Text("حسناً"))])); }, child: const Icon(Icons.chat, color: Colors.white)),
+      appBar: AppBar(backgroundColor: Color(0xFF075E54), title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Text("WhatsApp", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), if(isDes) Container(margin: EdgeInsets.only(right: 6), padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)), child: Text("المصمم ⭐", style: TextStyle(fontSize: 9, color: Color(0xFF075E54))))]), Text("${widget.name} - ${widget.phone}", style: TextStyle(color: Colors.white70, fontSize: 11)) ])),
+      body: Container(color: Colors.white, child: ListView.builder(itemCount: users.length, itemBuilder: (_,i){
+        var u = users[i];
+        return ListTile(leading: CircleAvatar(backgroundColor: Color(0xFFDFE5E7), child: Text(u['name']![0])), title: Row(children: [Text(u['name']!, style: TextStyle(fontWeight: FontWeight.bold)), SizedBox(width: 4), Icon(Icons.lock, size: 12, color: Color(0xFF075E54))]), subtitle: Text(u['msg']!, maxLines: 1), trailing: Text("12:30", style: TextStyle(fontSize: 11, color: Color(0xFF25D366))),
+          onTap: (){ Navigator.push(context, MaterialPageRoute(builder: (_)=> ChatPage(contact: u, myPhone: widget.phone, myName: widget.name))); }
+        );
+      }),
+      floatingActionButton: FloatingActionButton(backgroundColor: Color(0xFF25D366), onPressed: (){}, child: Icon(Icons.chat, color: Colors.white)),
     ));
   }
 }
-
-// ============ دردشة خاصة منفصلة + اتصال صوت وصورة ============
-class PrivateChatPage extends StatefulWidget { final Map<String,String> contact; final String myPhone; final String myName; final Map<String, List<Map<String,dynamic>>> chats; const PrivateChatPage({super.key, required this.contact, required this.myPhone, required this.myName, required this.chats}); @override State<PrivateChatPage> createState()=> _PrivateChatState(); }
-class _PrivateChatState extends State<PrivateChatPage> {
+class ChatPage extends StatefulWidget{ final Map<String,String> contact; final String myPhone; final String myName; ChatPage({required this.contact, required this.myPhone, required this.myName}); @override State<ChatPage> createState()=> _ChatS(); }
+class _ChatS extends State<ChatPage>{
   final ctrl = TextEditingController();
-  void send(String type, String txt){ if(txt.trim().isEmpty) return; widget.chats.putIfAbsent(widget.contact['phone']!, ()=>[]); widget.chats[widget.contact['phone']!]!.add({'text': txt, 'type': type, 'isMe': true, 'time': DateTime.now()}); ctrl.clear(); setState((){}); Future.delayed(const Duration(seconds: 1), (){ if(!mounted) return; widget.chats[widget.contact['phone']!]!.add({'text': "تم - دردشة خاصة منفصلة", 'type': "text", 'isMe': false, 'time': DateTime.now()}); setState((){}); }); }
-
-  void startCall(bool isVideo){
-    Navigator.push(context, MaterialPageRoute(builder: (_)=> CallPage(contact: widget.contact, isVideo: isVideo)));
-  }
-
+  List<Map<String,dynamic>> msgs = [];
+  void send(String t, String txt){ if(txt.trim().isEmpty) return; setState(()=> msgs.add({'text': txt, 'type': t, 'isMe': true})); ctrl.clear(); Future.delayed(Duration(seconds: 1), (){ setState(()=> msgs.add({'text': "تم - خاص", 'type': 'text', 'isMe': false})); }); }
+  void callPage(bool video){ Navigator.push(context, MaterialPageRoute(builder: (_)=> CallPage(name: widget.contact['name']!, video: video))); }
   @override Widget build(BuildContext context){
-    var msgs = widget.chats[widget.contact['phone']] ?? [];
     return Directionality(textDirection: TextDirection.rtl, child: Scaffold(
-      appBar: AppBar(backgroundColor: const Color(0xFF075E54), title: Row(children: [CircleAvatar(backgroundColor: Colors.white, child: Text(widget.contact['name']![0])), const SizedBox(width: 8), Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Text(widget.contact['name']!, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)), const Icon(Icons.verified, size: 14, color: Color(0xFF25D366))]), Text("${widget.contact['phone']} • ${widget.contact['ip']} • خاص 🔒", style: const TextStyle(color: Colors.white70, fontSize: 10))])]), actions: [IconButton(icon: const Icon(Icons.videocam, color: Colors.white), onPressed: ()=> startCall(true)), IconButton(icon: const Icon(Icons.call, color: Colors.white), onPressed: ()=> startCall(false)), const Icon(Icons.more_vert, color: Colors.white)]),
+      appBar: AppBar(backgroundColor: Color(0xFF075E54), title: Text(widget.contact['name']!, style: TextStyle(color: Colors.white, fontSize: 16)), actions: [IconButton(icon: Icon(Icons.videocam, color: Colors.white), onPressed: ()=> callPage(true)), IconButton(icon: Icon(Icons.call, color: Colors.white), onPressed: ()=> callPage(false))]),
       body: Column(children: [
-        Container(color: const Color(0xFFFEF3C7), padding: const EdgeInsets.all(8), child: const Row(children: [Icon(Icons.lock, size: 14, color: Colors.orange), SizedBox(width: 6), Expanded(child: Text("🔒 دردشة خاصة منفصلة - مشفرة بين جهازين فقط - لا يراها أحد على الشبكة - محفوظة برقمك", style: TextStyle(fontSize: 10)))])),
-        Expanded(child: Container(color: const Color(0xFFE5DDD5), child: ListView.builder(reverse: true, padding: const EdgeInsets.all(8), itemCount: msgs.length, itemBuilder: (_, i){ var m = msgs[msgs.length-1-i]; bool isMe = m['isMe']; return Align(alignment: isMe? Alignment.centerLeft: Alignment.centerRight, child: Container(margin: const EdgeInsets.symmetric(vertical: 3), padding: const EdgeInsets.all(10), constraints: const BoxConstraints(maxWidth: 260), decoration: BoxDecoration(color: isMe? const Color(0xFFDCF8C6): Colors.white, borderRadius: BorderRadius.circular(8)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if(m['type']=="text") Text(m['text'], style: const TextStyle(fontSize: 14)), if(m['type']=="image") Container(height: 120, width: 180, decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), image: const DecorationImage(image: NetworkImage("https://picsum.photos/200"), fit: BoxFit.cover))), if(m['type']=="voice") const Row(children: [Icon(Icons.mic, size: 16, color: Color(0xFF075E54)), SizedBox(width: 4), Text("رسالة صوتية 0:18", style: TextStyle(fontSize: 12))]), const SizedBox(height: 2), Row(mainAxisAlignment: MainAxisAlignment.end, children: [Text("${m['time'].hour}:${m['time'].minute.toString().padLeft(2,'0')}", style: const TextStyle(fontSize: 9, color: Colors.grey)), if(isMe) const Icon(Icons.done_all, size: 14, color: Colors.blue)])]))); }))),
-        Container(color: Colors.white, padding: const EdgeInsets.all(6), child: Row(children: [IconButton(icon: const Icon(Icons.emoji_emotions_outlined), onPressed: ()=> send("text", "😍")), IconButton(icon: const Icon(Icons.attach_file), onPressed: ()=> send("image", "صورة")), Expanded(child: TextField(controller: ctrl, decoration: InputDecoration(hintText: "رسالة خاصة...", border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none), filled: true, fillColor: const Color(0xFFF0F0F0)))), const SizedBox(width: 4), CircleAvatar(backgroundColor: const Color(0xFF25D366), child: IconButton(icon: const Icon(Icons.send, color: Colors.white, size: 18), onPressed: ()=> send("text", ctrl.text)))]))
+        Container(color: Color(0xFFFEF3C7), padding: EdgeInsets.all(6), child: Row(children: [Icon(Icons.lock, size: 14, color: Colors.orange), SizedBox(width: 6), Expanded(child: Text("دردشة خاصة منفصلة - ${widget.myPhone} -> ${widget.contact['phone']} - مشفرة", style: TextStyle(fontSize: 10)))])),
+        Expanded(child: Container(color: Color(0xFFE5DDD5), child: ListView.builder(reverse: true, padding: EdgeInsets.all(8), itemCount: msgs.length, itemBuilder: (_,i){ var m = msgs[msgs.length-1-i]; bool isMe = m['isMe']; return Align(alignment: isMe? Alignment.centerLeft: Alignment.centerRight, child: Container(margin: EdgeInsets.symmetric(vertical: 3), padding: EdgeInsets.all(10), decoration: BoxDecoration(color: isMe? Color(0xFFDCF8C6): Colors.white, borderRadius: BorderRadius.circular(8)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [if(m['type']=='text') Text(m['text']), if(m['type']=='image') Container(height: 100, width: 150, color: Colors.black12, child: Icon(Icons.image, size: 40)), if(m['type']=='voice') Row(children: [Icon(Icons.mic, size: 16), Text(" 0:18")]), Text("12:30", style: TextStyle(fontSize: 9, color: Colors.grey))]))); }))),
+        Container(color: Colors.white, padding: EdgeInsets.all(6), child: Row(children: [IconButton(icon: Icon(Icons.photo), onPressed: ()=> send('image','صورة')), Expanded(child: TextField(controller: ctrl, decoration: InputDecoration(hintText: "رسالة خاصة...", border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none), filled: true, fillColor: Color(0xFFF0F0F0)))), SizedBox(width: 6), CircleAvatar(backgroundColor: Color(0xFF25D366), child: IconButton(icon: Icon(Icons.send, color: Colors.white, size: 18), onPressed: ()=> send('text', ctrl.text)))]))
       ]),
     ));
   }
 }
-
-// ============ صفحة اتصال صوت وصورة ============
-class CallPage extends StatefulWidget { final Map<String,String> contact; final bool isVideo; const CallPage({super.key, required this.contact, required this.isVideo}); @override State<CallPage> createState()=> _CallState(); }
-class _CallState extends State<CallPage> {
-  int sec = 0; Timer? t;
-  @override void initState(){ super.initState(); t = Timer.periodic(const Duration(seconds: 1), (_){ setState(()=> sec++); }); }
-  @override void dispose(){ t?.cancel(); super.dispose(); }
-  String fmt(int s){ int m = s~/60; int ss = s%60; return "${m.toString().padLeft(2,'0')}:${ss.toString().padLeft(2,'0')}"; }
+class CallPage extends StatefulWidget{ final String name; final bool video; CallPage({required this.name, required this.video}); @override State<CallPage> createState()=> _CallS(); }
+class _CallS extends State<CallPage>{
+  int sec = 0;
+  @override void initState(){ super.initState(); Timer.periodic(Duration(seconds: 1), (t){ if(mounted) setState(()=> sec++); }); }
   @override Widget build(BuildContext context){
-    return Directionality(textDirection: TextDirection.rtl, child: Scaffold(backgroundColor: const Color(0xFF111B21),
-      body: Column(children: [
-        Expanded(child: Stack(children: [
-          if(widget.isVideo) Container(color: const Color(0xFF1F2C34), child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircleAvatar(radius: 50, backgroundColor: const Color(0xFFDFE5E7), child: Text(widget.contact['name']![0], style: const TextStyle(fontSize: 40, color: Color(0xFF075E54)))), const SizedBox(height: 12), Text(widget.contact['name']!, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)), Text("مكالمة فيديو LAN • ${fmt(sec)} • ${widget.contact['ip']}", style: const TextStyle(color: Colors.white70)), const SizedBox(height: 20), Container(width: 90, height: 120, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.white)), child: const Icon(Icons.person, color: Colors.white, size: 40))]))),
-          if(!widget.isVideo) Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircleAvatar(radius: 60, backgroundColor: const Color(0xFF25D366), child: Text(widget.contact['name']![0], style: const TextStyle(fontSize: 50, color: Colors.white))), const SizedBox(height: 16), Text(widget.contact['name']!, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)), Text("مكالمة صوتية LAN • ${fmt(sec)}", style: const TextStyle(color: Colors.white70)), const SizedBox(height: 8), const Text("🔒 مشفرة - بدون إنترنت - نفس الواي فاي", style: TextStyle(color: Color(0xFF25D366), fontSize: 12)) ])),
-          Positioned(top: 50, left: 20, right: 20, child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(20)), child: Row(children: [const Icon(Icons.lock, color: Colors.white, size: 14), Text
+    return Scaffold(backgroundColor: Color(0xFF111B21), body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      CircleAvatar(radius: 60, backgroundColor: Color(0xFF25D366), child: Text(widget.name[0], style: TextStyle(fontSize: 50, color: Colors.white))),
+      SizedBox(height: 12), Text(widget.name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+      Text("${widget.video? "مكالمة فيديو":"مكالمة صوتية"} - ${sec~/60}:${(sec%60).toString().padLeft(2,'0')}", style: TextStyle(color: Colors.white70)),
+      SizedBox(height: 20), if(widget.video) Container(width: 90, height: 120, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)), child: Icon(Icons.person, color: Colors.white, size: 40)),
+      SizedBox(height: 30),
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.mic_off, color: Colors.white)),
+        SizedBox(width: 20),
+        CircleAvatar(backgroundColor: Colors.red, radius: 28, child: IconButton(icon: Icon(Icons.call_end, color: Colors.white), onPressed: ()=> Navigator.pop(context))),
+        SizedBox(width: 20),
+        CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.volume_up, color: Colors.white)),
+      ])
+    ])));
+  }
+}
