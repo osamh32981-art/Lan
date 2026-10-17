@@ -1,43 +1,56 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
-void main(){runApp(MaterialApp(debugShowCheckedModeBanner:false,home:Login()));}
-class Login extends StatelessWidget{
-final p=TextEditingController(text:"05");
-final n=TextEditingController(text:"المصمم");
-@override Widget build(BuildContext c){
-return Scaffold(backgroundColor:Color(0xFF111B21),body:Center(child:Container(margin:EdgeInsets.all(20),padding:EdgeInsets.all(20),decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(12)),child:Column(mainAxisSize:MainAxisSize.min,children:[
-Icon(Icons.lock,size:50,color:Color(0xFF075E54)),
-Text("WhatsApp LAN",style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)),
-Text("دخول برقم واسم - خصوصية",style:TextStyle(fontSize:11,color:Colors.grey)),
-SizedBox(height:12),
-TextField(controller:p,decoration:InputDecoration(labelText:"رقم الجوال",border:OutlineInputBorder(),prefixIcon:Icon(Icons.phone))),
-SizedBox(height:8),
-TextField(controller:n,decoration:InputDecoration(labelText:"اسم المستخدم",border:OutlineInputBorder(),prefixIcon:Icon(Icons.person))),
-SizedBox(height:12),
-SizedBox(width:double.infinity,height:48,child:ElevatedButton(style:ElevatedButton.styleFrom(backgroundColor:Color(0xFF25D366)),onPressed:(){Navigator.pushReplacement(c,MaterialPageRoute(builder:(_)=>Home(phone:p.text,name:n.text)));},child:Text("دخول آمن",style:TextStyle(color:Colors.white))))
-]))));}}
-class Home extends StatelessWidget{
-final String phone;final String name;
-Home({required this.phone,required this.name});
-@override Widget build(BuildContext c){
-var users=[{'name':'أحمد','phone':'0555123456','msg':'دردشة خاصة 🔒'},{'name':'محمد','phone':'0555987000','msg':'📸 صورة'},{'name':'لابتوب','phone':'0555000111','msg':'🎤 مكالمة'}];
-bool isDes=name.contains("المصمم");
-return Directionality(textDirection:TextDirection.rtl,child:Scaffold(
-appBar:AppBar(backgroundColor:Color(0xFF075E54),title:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Row(children:[Text("WhatsApp",style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold)),if(isDes)Container(margin:EdgeInsets.only(right:6),padding:EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(8)),child:Text("المصمم ⭐",style:TextStyle(fontSize:9,color:Color(0xFF075E54))))]),Text("$name • $phone",style:TextStyle(color:Colors.white70,fontSize:11))])),
-body:ListView.builder(itemCount:users.length,itemBuilder:(_,i){var u=users[i];return ListTile(leading:CircleAvatar(child:Text(u['name']![0])),title:Text(u['name']!),subtitle:Text(u['msg']!),trailing:Text("12:30",style:TextStyle(fontSize:11,color:Color(0xFF25D366))),onTap:(){Navigator.push(c,MaterialPageRoute(builder:(_)=>Chat(contact:u,myPhone:phone)));});}),
-floatingActionButton:FloatingActionButton(backgroundColor:Color(0xFF25D366),onPressed:(){},child:Icon(Icons.chat,color:Colors.white)),
-));}}
-class Chat extends StatefulWidget{final Map<String,String> contact;final String myPhone;Chat({required this.contact,required this.myPhone});@override State<Chat> createState()=>_ChatS();}
-class _ChatS extends State<Chat>{
-final ctrl=TextEditingController();List<String> msgs=[];
-@override Widget build(BuildContext c){
-return Scaffold(
-appBar:AppBar(backgroundColor:Color(0xFF075E54),title:Text(widget.contact['name']!,style:TextStyle(color:Colors.white)),actions:[IconButton(icon:Icon(Icons.videocam,color:Colors.white),onPressed:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>CallPage(name:widget.contact['name']!,video:true)))),IconButton(icon:Icon(Icons.call,color:Colors.white),onPressed:()=>Navigator.push(c,MaterialPageRoute(builder:(_)=>CallPage(name:widget.contact['name']!,video:false))))]),
-body:Column(children:[
-Container(color:Color(0xFFFEF3C7),padding:EdgeInsets.all(6),child:Text("🔒 ${widget.myPhone} -> ${widget.contact['phone']} - دردشة منفصلة مشفرة",style:TextStyle(fontSize:10))),
-Expanded(child:Container(color:Color(0xFFE5DDD5),child:ListView.builder(reverse:true,padding:EdgeInsets.all(8),itemCount:msgs.length,itemBuilder:(_,i){return Align(alignment:Alignment.centerLeft,child:Container(margin:EdgeInsets.all(4),padding:EdgeInsets.all(10),decoration:BoxDecoration(color:Color(0xFFDCF8C6),borderRadius:BorderRadius.circular(8)),child:Text(msgs[msgs.length-1-i])));}))),
-Container(color:Colors.white,padding:EdgeInsets.all(6),child:Row(children:[Expanded(child:TextField(controller:ctrl,decoration:InputDecoration(hintText:"رسالة...",border:OutlineInputBorder(borderRadius:BorderRadius.circular(20))))),SizedBox(width:6),FloatingActionButton.small(backgroundColor:Color(0xFF25D366),onPressed:(){if(ctrl.text.trim().isEmpty)return;setState(()=>msgs.add(ctrl.text));ctrl.clear();},child:Icon(Icons.send,color:Colors.white))]))])
-);}
+
+void main() => runApp(LANApp());
+
+class LANApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: Color(0xFF0A192F)),
+      home: SplashScreen(),
+    );
+  }
 }
-class CallPage extends StatefulWidget{final String name;final bool video;CallPage({required this.name,required this.video});@override State<CallPage> createState()=>_CallS();}
-class _CallS extends State<CallPage>{int s=0;Timer? t;@override void initState(){super.initState();t=Timer.periodic(Duration(seconds:1),(x){if(mounted)setState(()=>s++);});}@override void dispose(){t?.cancel();super.dispose();}@override Widget build(BuildContext c){return Scaffold(backgroundColor:Color(0xFF111B21),body:Center(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[CircleAvatar(radius:60,backgroundColor:Color(0xFF25D366),child:Text(widget.name[0],style:TextStyle(fontSize:50,color:Colors.white))),SizedBox(height:12),Text(widget.name,style:TextStyle(color:Colors.white,fontSize:22)),Text("${s~/60}:${(s%60).toString().padLeft(2,'0')}",style:TextStyle(color:Colors.white70)),SizedBox(height:30),CircleAvatar(backgroundColor:Colors.red,radius:30,child:IconButton(icon:Icon(Icons.call_end,color:Colors.white),onPressed:()=>Navigator.pop(c)))])));}}
+
+// 1. شاشة البداية - مثل الصورة
+class SplashScreen extends StatefulWidget {
+  @override State<SplashScreen> createState()=>_SplashS();
+}
+class _SplashS extends State<SplashScreen>{
+  @override void initState(){super.initState(); Future.delayed(Duration(seconds: 2), ()=> Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>MainScreen())));}
+  @override Widget build(BuildContext c){
+    return Scaffold(backgroundColor: Color(0xFF07132E),
+      body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Container(width:120,height:120,decoration:BoxDecoration(color:Color(0xFF0E2342),borderRadius:BorderRadius.circular(28),border: Border.all(color: Color(0xFF1E90FF),width:1)),child: Icon(Icons.wifi, size:60, color: Color(0xFF1E90FF))),
+        SizedBox(height:16),
+        RichText(text: TextSpan(children: [TextSpan(text:"LAN ",style:TextStyle(color:Color(0xFF1E90FF),fontSize:26,fontWeight:FontWeight.bold)), TextSpan(text:"Connect",style:TextStyle(color:Colors.white,fontSize:26,fontWeight:FontWeight.bold))])),
+        SizedBox(height:6),
+        Text("اتصال صوت وصورة عبر شبكة LAN",style:TextStyle(color:Colors.white70,fontSize:12)),
+        SizedBox(height:6),
+        Container(padding:EdgeInsets.symmetric(horizontal:12,vertical:4),decoration:BoxDecoration(color:Color(0xFF0E2342),borderRadius:BorderRadius.circular(20)),child: Row(mainAxisSize: MainAxisSize.min,children: [Icon(Icons.wifi_off,size:14,color:Color(0xFF1E90FF)),SizedBox(width:6),Text("بدون إنترنت",style:TextStyle(color:Colors.white70,fontSize:11))])),
+      ])),
+    );
+  }
+}
+
+// 2. الشاشة الرئيسية - نفس الصورة
+class MainScreen extends StatefulWidget{
+  @override State<MainScreen> createState()=>_MainS();
+}
+class _MainS extends State<MainScreen>{
+  String myIp = "جاري جلب IP...";
+  ServerSocket? server;
+  List<Socket> clients=[];
+  bool hosting=false;
+
+  @override void initState(){super.initState(); _getIp();}
+
+  Future<void> _getIp() async {
+    try{
+      var interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
+      for(var i in interfaces){
+        for(var addr in i.addresses){
+          if(!addr.address.startsWith("127") && addr.address.contains("192.168")){
