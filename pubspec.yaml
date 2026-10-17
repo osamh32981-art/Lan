@@ -1,5 +1,5 @@
 name: whatsapp
-description: whatsapp lan
+description: whatsapp lan private
 publish_to: 'none'
 version: 1.0.0+1
 environment:
